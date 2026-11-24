@@ -56,3 +56,4 @@ output-*.txt
 __pycache__/
 *.py[cod]
 infra/app/lambda.zip
+infra/app/.terraform.lock.hcl
