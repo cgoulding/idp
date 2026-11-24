@@ -34,6 +34,7 @@ bin/
 **/.terraform/*
 *.tfstate
 *.tfstate.*
+.terraform.tfstate.lock.info
 *.tfvars
 *.tfvars.json
 *.tfplan
@@ -50,3 +51,8 @@ terraform.rc
 ### Local outputs ###
 *.log
 output-*.txt
+
+### Python / Lambda build artifacts ###
+__pycache__/
+*.py[cod]
+infra/app/lambda.zip

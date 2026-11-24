@@ -21,7 +21,7 @@ provider "aws" {
 }
 
 provider "aws" {
-  alias = "use1"
+  alias  = "use1"
   region = "us-east-1"
 }
 
@@ -29,9 +29,9 @@ data "aws_partition" "current" {}
 data "aws_caller_identity" "current" {}
 
 locals {
-  partition                  = data.aws_partition.current.partition
-  bedrock_model_arn_wildcard = "arn:${local.partition}:bedrock:*::foundation-model/*"
-  bedrock_sonnet_inference_profile_arn = "arn:${local.partition}:bedrock:${var.aws_region}:${data.aws_caller_identity.current.account_id}:inference-profile/eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
+  partition                             = data.aws_partition.current.partition
+  bedrock_model_arn_wildcard            = "arn:${local.partition}:bedrock:*::foundation-model/*"
+  bedrock_sonnet_inference_profile_arn  = "arn:${local.partition}:bedrock:${var.aws_region}:${data.aws_caller_identity.current.account_id}:inference-profile/eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
   bedrock_sonnet_inference_profile_name = "eu.anthropic.claude-sonnet-4-5-20250929-v1"
 }
 
@@ -80,6 +80,34 @@ resource "aws_s3_bucket_lifecycle_configuration" "uploads" {
     filter { prefix = "textract-results/" }
     expiration { days = 30 }
   }
+}
+resource "aws_s3_bucket_policy" "uploads_console_read" {
+  count  = length(var.s3_console_reader_principal_arns) > 0 ? 1 : 0
+  bucket = aws_s3_bucket.uploads.id
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid       = "AllowConsoleReadersToListUploadsBucket",
+        Effect    = "Allow",
+        Principal = { AWS = var.s3_console_reader_principal_arns },
+        Action    = ["s3:ListBucket", "s3:GetBucketLocation"],
+        Resource  = aws_s3_bucket.uploads.arn
+      },
+      {
+        Sid       = "AllowConsoleReadersToReadUploadObjects",
+        Effect    = "Allow",
+        Principal = { AWS = var.s3_console_reader_principal_arns },
+        Action = [
+          "s3:GetObject",
+          "s3:GetObjectAttributes",
+          "s3:GetObjectTagging",
+          "s3:GetObjectVersion"
+        ],
+        Resource = "${aws_s3_bucket.uploads.arn}/*"
+      }
+    ]
+  })
 }
 
 # --- DynamoDB ---
@@ -227,11 +255,11 @@ resource "aws_iam_policy" "lambda_app_policy" {
           local.bedrock_model_arn_wildcard,
           local.bedrock_sonnet_inference_profile_arn
         ]
-#        Condition = {
-#          StringLike = {
-#            "aws:InferenceProfileArn" = local.bedrock_sonnet_inference_profile_name
-#          }
-#        }
+        #        Condition = {
+        #          StringLike = {
+        #            "aws:InferenceProfileArn" = local.bedrock_sonnet_inference_profile_name
+        #          }
+        #        }
       },
       { Effect = "Allow", Action = ["s3:GetObject", "s3:PutObject"], Resource = ["${aws_s3_bucket.uploads.arn}/*"] },
       { Effect = "Allow", Action = ["s3:ListBucket"], Resource = ["${aws_s3_bucket.uploads.arn}"] },

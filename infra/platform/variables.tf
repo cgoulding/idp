@@ -25,6 +25,12 @@ variable "cors_allowed_origins" {
   default = ["*"]
 }
 
+variable "s3_console_reader_principal_arns" {
+  type        = list(string)
+  description = "IAM principal ARNs allowed to browse and read the uploads bucket from the AWS console."
+  default     = ["arn:aws:iam::521706538227:user/Administrator"]
+}
+
 variable "seed_api_key_value" {
   type = string
 }

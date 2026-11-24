@@ -163,6 +163,9 @@ VALIDATION / CONSISTENCY CHECKS (DO THESE BEFORE OUTPUT):
 - If openingBalance is not clearly stated, omit openingBalance.
 - closingBalance should match the final transaction’s balance when possible.
 
+MAPPING RULES:
+- Map the source input statement text as sourceStatementText
+
 NOW PARSE THIS STATEMENT TEXT:
 {{STATEMENT_TEXT}}
 '''
@@ -243,11 +246,14 @@ SCHEMA_REGISTRY: dict[SchemaType, dict[str, Any]] = {
             }
           },
     SchemaType.TRANSACTIONS: {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "additionalProperties": False,
   "required": ["account", "statementPeriod", "transactions", "closingBalance"],
   "properties": {
+    "sourceStatementText": {
+                "type": "string",
+                "description": "The source input statement text."
+              },
     "statementMeta": {
       "type": "object",
       "additionalProperties": False,

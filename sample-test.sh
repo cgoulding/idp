@@ -8,4 +8,4 @@ JWT="eyJraWQiOiJIN080V0I4b2tmeSticUZHMUcwVXV0U011OEI2cWQxU1dkb05QNzhqSCtNPSIsImF
   --file ./sample-payslip.pdf \
   --file-type pdf \
   --content-type application/pdf \
-  --prompt "Given that the document is a payslip, get the first name, last name and PPS number"
+  --prompt "Given that the docent is a payslip, get the first name, last name and PPS number"
